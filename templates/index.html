@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Emotion-Based Meal Recommendation 🍽️</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            text-align: center;
+            padding: 40px;
+        }
+        h1 {
+            color: #333;
+            font-size: 28px;
+        }
+        p {
+            color: #555;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .meal {
+            background: white;
+            width: 50%;
+            margin: 15px auto;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 6px rgba(0,0,0,0.2);
+        }
+        h2 {
+            color: #444;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Emotion-Based Meal Recommendation 🍽️</h1>
+    <p>Click below to detect your emotion and get your personalized meal menu!</p>
+
+    <button onclick="startCamera()">Start Camera</button>
+
+    <h2 id="emotion"></h2>
+    <div id="recommendations"></div>
+
+    <script>
+        function startCamera() {
+            const emotionElement = document.getElementById('emotion');
+            const container = document.getElementById('recommendations');
+
+            emotionElement.innerText = "Detecting emotion... Please wait.";
+            container.innerHTML = "";
+
+            fetch('/start_camera')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); // Debug in browser console
+                    emotionElement.innerText =
+                        "Detected Emotion: " + (data.emotion || "Not detected");
+
+                    container.innerHTML = "";
+
+                    if (data.meals && data.meals.length > 0) {
+                        data.meals.forEach(item => {
+                            let div = document.createElement('div');
+                            div.classList.add('meal');
+                            div.innerHTML = `
+                                <h3>${item.Category}</h3>
+                                <p>${item.Item}</p>
+                            `;
+                            container.appendChild(div);
+                        });
+                    } else {
+                        container.innerHTML = "<p>No matching meals found.</p>";
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    emotionElement.innerText = "Error detecting emotion.";
+                    container.innerHTML = "";
+                });
+        }
+    </script>
+</body>
+</html>
